@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed 's/data:image\\\\/[a-z]*;base64,[A-Za-z0-9+\\\\/=]*/data:image[BASE64]/g' invitacion-erika-xv.html)",
+      "Read(//tmp/**)",
+      "Bash(cat /tmp/inv-clean.html)",
+      "Bash(taskkill //F //IM python.exe)"
+    ]
+  }
+}
