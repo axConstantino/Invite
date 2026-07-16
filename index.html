@@ -69,6 +69,17 @@
   .reveal-blur{opacity:0;filter:blur(8px);transform:translateY(14px);transition:opacity 1.1s ease, filter 1.1s ease, transform 1.1s ease;}
   .reveal-blur.is-visible{opacity:1;filter:blur(0);transform:translateY(0);}
 
+  /* Mientras el sobre está cerrado, TODO el contenido de atrás queda pausado:
+     así la animación de apertura corre sola y se ve fluida en el celular */
+  html.pre-open :is(.hero,section,.finale,footer),
+  html.pre-open :is(.hero,section,.finale,footer) *,
+  html.pre-open :is(.hero,section,.finale,footer) *::before,
+  html.pre-open :is(.hero,section,.finale,footer) *::after,
+  html.pre-open :is(.hero,section,.finale,footer)::before,
+  html.pre-open :is(.hero,section,.finale,footer)::after{
+    animation-play-state:paused !important;
+  }
+
   /* variantes de entrada desde los lados, para dar ritmo al scroll */
   .blessing-col.reveal:nth-child(1){transform:translateX(-36px);}
   .blessing-col.reveal:nth-child(2){transform:translateX(36px);transition-delay:.12s;}
@@ -133,7 +144,7 @@
   .has-blobs{overflow:hidden;}
   .glow-blob{
     position:absolute;width:300px;height:300px;border-radius:50%;
-    filter:blur(65px);opacity:.55;pointer-events:none;
+    filter:blur(42px);opacity:.55;pointer-events:none;
     animation:blobFloat 14s ease-in-out infinite alternate;
   }
   .glow-blob.rosa{background:rgba(217,136,187,.35);}
@@ -155,7 +166,10 @@
       rgba(241,234,250,.85) 55%, rgba(255,251,246,.4) 80%,
       rgba(251,234,241,.85) 100%);
     background-size:250% 250%;
-    animation:auroraShift 22s ease-in-out infinite alternate;
+  }
+  /* las auroras solo se mueven en PC: en móvil repintar la sección entera traba el scroll */
+  @media(min-width:900px){
+    .aurora-soft{animation:auroraShift 22s ease-in-out infinite alternate;}
   }
 
   /* ---------- sección oscura: terciopelo ciruela con polvo de estrellas ---------- */
@@ -222,7 +236,8 @@
   }
 
   /* ---------- manchas de acuarela en los fondos ---------- */
-  .wc{position:absolute;pointer-events:none;z-index:0;opacity:.6;animation:wcBreath 14s ease-in-out infinite alternate;}
+  .wc{position:absolute;pointer-events:none;z-index:0;opacity:.55;}
+  @media(min-width:900px){.wc{animation:wcBreath 14s ease-in-out infinite alternate;}}
   @keyframes wcBreath{from{opacity:.42;}to{opacity:.68;}}
   .wc.tl{top:-30px;left:-70px;width:250px;transform:rotate(-14deg);}
   .wc.tr{top:-30px;right:-70px;width:260px;transform:rotate(10deg);}
@@ -253,6 +268,7 @@
     display:flex;align-items:center;justify-content:center;flex-direction:column;
     transition:opacity 1s ease, visibility 1s ease;
     overflow:hidden;
+    will-change:opacity;
   }
   #envelopeOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 
@@ -334,6 +350,8 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     z-index:2;
     transition:transform 1s cubic-bezier(.25,.7,.3,1);
+    will-change:transform,opacity;
+    backface-visibility:hidden;
   }
   .env-letter .flower{width:20px;height:20px;margin-bottom:6px;}
   .env-mono{font-family:var(--font-script);font-size:26px;color:var(--rosa-oscuro);line-height:1;}
@@ -389,6 +407,7 @@
     z-index:4;
     box-shadow:0 10px 22px -12px rgba(0,0,0,.4);
     transition:transform .8s cubic-bezier(.4,.1,.2,1) .2s, background .5s ease .5s;
+    will-change:transform;
   }
   /* pliegue con volumen + reflejo satinado diagonal */
   .env-flap::before{
@@ -534,14 +553,19 @@
   }
   .hero-content .eyebrow::after{background:linear-gradient(90deg, rgba(232,210,160,.85), transparent);}
   .hero-name{line-height:1.05;}
+  .hero-name{position:relative;}
   .hero-name .script{
     display:block;font-family:var(--font-script);font-size:clamp(52px,15vw,78px);color:#fff;
-    animation:nameGlow 4.5s ease-in-out infinite;
+    text-shadow:0 3px 22px rgba(0,0,0,.6);
   }
-  @keyframes nameGlow{
-    0%,100%{text-shadow:0 3px 22px rgba(0,0,0,.6), 0 0 16px rgba(183,156,216,0);}
-    50%{text-shadow:0 3px 22px rgba(0,0,0,.6), 0 0 26px rgba(203,179,234,.65), 0 0 48px rgba(217,136,187,.4);}
+  /* resplandor del nombre: un halo que pulsa solo con opacidad (barato en GPU) */
+  .hero-name::before{
+    content:'';position:absolute;left:50%;top:34%;width:110%;height:120px;
+    transform:translate(-50%,-50%);z-index:-1;pointer-events:none;
+    background:radial-gradient(closest-side, rgba(203,179,234,.5), rgba(217,136,187,.22) 55%, transparent 78%);
+    animation:glowFade 4.5s ease-in-out infinite;
   }
+  @keyframes glowFade{0%,100%{opacity:.15;}50%{opacity:.9;}}
   .hero-name .surname{
     display:block;font-family:var(--font-body);font-weight:600;font-size:14px;
     letter-spacing:.3em;text-transform:uppercase;margin-top:6px;color:var(--rosa-suave);
@@ -593,6 +617,7 @@
   }
   .hero-crest .drop{width:1px;height:20px;background:linear-gradient(180deg, rgba(232,210,160,.9), transparent);}
   .hero-crest .xv{
+    position:relative;
     width:52px;height:52px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     font-family:var(--font-display);font-weight:600;font-size:20px;letter-spacing:.04em;color:var(--dorado-claro);
@@ -600,17 +625,18 @@
     background:rgba(45,35,64,.35);
     -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     box-shadow:0 0 0 4px rgba(45,35,64,.18), inset 0 1px 0 rgba(255,255,255,.25);
-    animation:crestGlow 4s ease-in-out infinite;
   }
-  @keyframes crestGlow{
-    0%,100%{box-shadow:0 0 0 4px rgba(45,35,64,.18), inset 0 1px 0 rgba(255,255,255,.25), 0 0 12px rgba(232,210,160,.25);}
-    50%{box-shadow:0 0 0 4px rgba(45,35,64,.18), inset 0 1px 0 rgba(255,255,255,.25), 0 0 26px rgba(232,210,160,.6);}
+  /* su halo también pulsa solo con opacidad */
+  .hero-crest .xv::after{
+    content:'';position:absolute;inset:-12px;border-radius:50%;z-index:-1;
+    background:radial-gradient(closest-side, rgba(232,210,160,.55), transparent 72%);
+    animation:glowFade 4s ease-in-out infinite;
   }
   .hero-crest .star{font-size:10px;color:#CBB3EA;text-shadow:0 0 8px rgba(203,179,234,.9);}
   /* pétalos subiendo sobre la foto */
   .hero .amb-petals{z-index:1;opacity:.55;}
   .hero .amb-petals span{width:11px;height:14px;box-shadow:none;}
-  @media (prefers-reduced-motion: reduce){.hero-crest .xv{animation:none;}}
+  @media (prefers-reduced-motion: reduce){.hero-crest .xv::after,.hero-name::before{animation:none;opacity:.5;}}
 
   /* En PC (pantalla ancha) la foto vertical no puede cubrir todo el ancho sin
      perder a la quinceañera: se muestra completa, centrada sobre un fondo elegante */
@@ -639,7 +665,9 @@
   .countdown-wrap{
     background:linear-gradient(135deg, var(--rosa-suave) 0%, var(--lila-suave) 45%, var(--rosa-suave) 100%);
     background-size:220% 220%;
-    animation:auroraShift 18s ease-in-out infinite alternate;
+  }
+  @media(min-width:900px){
+    .countdown-wrap{animation:auroraShift 18s ease-in-out infinite alternate;}
   }
   .countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:380px;margin:38px auto 0;}
   @media(min-width:600px){.countdown{gap:14px;max-width:420px;}}
@@ -790,8 +818,10 @@
   .gallery-wrap{
     background:linear-gradient(165deg, var(--lila-suave) 0%, var(--rosa-suave) 55%, var(--lila-suave) 100%);
     background-size:200% 200%;
-    animation:auroraShift 24s ease-in-out infinite alternate;
     overflow:hidden;
+  }
+  @media(min-width:900px){
+    .gallery-wrap{animation:auroraShift 24s ease-in-out infinite alternate;}
   }
   .deco-flower{position:absolute;pointer-events:none;opacity:.14;z-index:0;}
   .deco-flower.f2 path{fill:var(--lila);}
@@ -958,17 +988,17 @@
 <!--
   ============================================================
   MÚSICA DE FONDO — instrucciones rápidas:
-  1) Copia tu archivo de audio a la MISMA carpeta que este index.html
-  2) Nómbralo "musica-fondo.mp3"  (o cambia el "src" del <source> de abajo
-     por el nombre/ruta que prefieras, incluso una carpeta "audio/tu-cancion.mp3")
+  1) Copia tu archivo .mp3 dentro de la carpeta "audio"
+  2) Nómbralo "musica-fondo.mp3"  (o cambia el "src" del <source>
+     de abajo por el nombre de tu archivo)
   3) Formatos aceptados por el navegador: mp3, ogg, wav
-  El audio empieza a sonar automáticamente en el momento en que el
-  invitado hace clic para abrir el sobre (los navegadores exigen ese
-  clic para poder reproducir audio con sonido).
+  El audio empieza a sonar (con fade-in suave) en el momento en que
+  el invitado toca el sobre para abrir la invitación — los navegadores
+  exigen ese toque para poder reproducir audio con sonido.
   ============================================================
 -->
-<audio id="bgAudio" loop preload="none">
-  <source src="musica-fondo.mp3" type="audio/mpeg">
+<audio id="bgAudio" loop preload="auto">
+  <source src="audio/musica-fondo.mp3" type="audio/mpeg">
 </audio>
 
 <button id="musicToggle" class="music-toggle" aria-label="Reproducir o pausar música" aria-pressed="false" type="button">
@@ -1402,6 +1432,10 @@
 (function(){
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Mientras el sobre está cerrado, el contenido de atrás queda pausado
+  // (ver regla CSS html.pre-open) para que la apertura corra fluida en móvil
+  document.documentElement.classList.add('pre-open');
+
   // ---- Envelope entrance ----
   var overlay = document.getElementById('envelopeOverlay');
   var envelope = document.getElementById('envelopeEl');
@@ -1422,14 +1456,25 @@
       envelope.classList.add('letter-zoom');
       overlay.classList.add('hidden');
     }, reduceMotion ? 0 : 2150);
+    // el contenido despierta cuando el sobre ya desapareció por completo
+    setTimeout(function(){
+      document.documentElement.classList.remove('pre-open');
+    }, reduceMotion ? 0 : 3300);
 
     if(audio){
-      audio.volume = 0.55;
+      audio.volume = 0;
       var p = audio.play();
       if(p && p.then){
         p.then(function(){
           musicToggle.classList.add('playing');
           musicToggle.setAttribute('aria-pressed','true');
+          // fade-in: la música entra creciendo durante ~2.5 segundos
+          var v = 0;
+          var fade = setInterval(function(){
+            v += 0.03;
+            if(v >= 0.55){ audio.volume = 0.55; clearInterval(fade); }
+            else { audio.volume = v; }
+          }, 140);
         }).catch(function(){ /* no hay pista todavía, o el navegador la bloqueó: no pasa nada */ });
       }
     }
@@ -1444,6 +1489,7 @@
   musicToggle.addEventListener('click', function(){
     if(!audio) return;
     if(audio.paused){
+      audio.volume = 0.55;
       audio.play().catch(function(){});
       musicToggle.classList.add('playing');
       musicToggle.setAttribute('aria-pressed','true');

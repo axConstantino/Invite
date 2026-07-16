@@ -1,0 +1,31 @@
+═══════════════════════════════════════════════════════
+  MÚSICA DE FONDO DE LA INVITACIÓN
+═══════════════════════════════════════════════════════
+
+1) Copia tu canción en ESTA carpeta (audio/)
+
+2) Renómbrala exactamente así:
+
+      musica-fondo.mp3
+
+3) ¡Listo! La música empieza a sonar automáticamente
+   cuando el invitado toca el sobre para abrir la
+   invitación, con un fade-in suave. El botón flotante
+   de la esquina inferior derecha la pausa/reanuda.
+
+─────────────────────────────────────────────────────────
+Si prefieres usar otro nombre de archivo, abre index.html
+y busca la línea:
+
+   <source src="audio/musica-fondo.mp3" type="audio/mpeg">
+
+y cambia "musica-fondo.mp3" por el nombre de tu archivo.
+
+Formatos aceptados: .mp3 (recomendado), .ogg, .wav
+Peso recomendado: menos de 5 MB para que cargue rápido
+en celulares (puedes recortar/comprimir la canción en
+una web como mp3cut.net si pesa mucho).
+─────────────────────────────────────────────────────────
+
+Puedes borrar este archivo de texto cuando quieras;
+solo es una guía.
